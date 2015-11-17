@@ -1,23 +1,29 @@
 whd_postgresql_data:
   container_name: whd_postgresql_data
-  image: bdelcamp/postgres:1
+  image: bdelcamp/postgres:master
   command: /bin/true
+  volumes: 
+    - /whd_data/postgres:/whd_data
 whd_data:
   container_name: whd_data
-  image: bdelcamp/whd:1
+  image: bdelcamp/whd:latest
   command: /bin/true
+  volumes: 
+    - /whd_data/whd:/whd_data
 whd_postgresql:
   container_name: whd_postgresql_service
-  image: bdelcamp/postgres:1
+  image: bdelcamp/postgres:master
   restart: always
   environment:
     - DB_USER=whd
     - DB_PASS=whd
     - DB_NAME=whd
-  volumes_from: ["whd_postgresql_data"]
+  volumes_from: 
+    - whd_postgresql_data
 whd:
   container_name: whd_service
-  image: bdelcamp/whd:1
-  external_links: ["whd_postgresql_service:db"]
-  volumes_from: ["whd_data"]
+  image: bdelcamp/whd
+  links: ["whd_postgresql:db"]
+  volumes_from:
+    - whd_data
   ports: ["80:8081"]
